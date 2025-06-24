@@ -4,15 +4,19 @@ import argparse
 import subprocess
 from datetime import datetime
 
-def run_command(command):
+def run_command(command, **kwargs):
     try:
-        result = subprocess.run(command, capture_output=True, text=True, check=True)
+        result = subprocess.run(command, capture_output=True, text=True, check=True, **kwargs)
         if result.stdout:
             print(result.stdout.strip())
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
         print(f"Error executing: {' '.join(command)}", file=sys.stderr)
-        print(e.stderr.strip(), file=sys.stderr)
+        if e.stderr:
+            print(e.stderr.strip(), file=sys.stderr)
+        if e.stdout:
+            print(e.stdout.strip(), file=sys.stderr)
+        print(f"Return code: {e.returncode}", file=sys.stderr)
         sys.exit(1)
 
 def handle_acp():
